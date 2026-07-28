@@ -1,31 +1,39 @@
-from fastapi import APIRouter, UploadFile, File
-from backend.services.data_loader import load_dataset
+from pathlib import Path
 import shutil
-import os
+
+from fastapi import APIRouter, File, HTTPException, UploadFile
+
+from backend.services.data_loader import load_dataset
+from backend.services.profiler import profile_dataset
 
 router = APIRouter(
     prefix="/upload",
     tags=["Upload"]
 )
 
-UPLOAD_FOLDER = "backend/uploads"
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = Path("backend/uploads")
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
 @router.post("/")
 async def upload_file(file: UploadFile = File(...)):
+    try:
+        file_path = UPLOAD_FOLDER / file.filename
 
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        df = load_dataset(file_path)
 
-    df = load_dataset(file_path)
+        profile = profile_dataset(df)
 
-    return {
-        "filename": file.filename,
-        "rows": len(df),
-        "columns": len(df.columns),
-        "column_names": list(df.columns)
-    }
+        return {
+            "filename": file.filename,
+            "profile": profile
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )

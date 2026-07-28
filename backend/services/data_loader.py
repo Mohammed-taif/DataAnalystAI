@@ -1,19 +1,33 @@
+from pathlib import Path
 import pandas as pd
 
 
-def load_dataset(file_path: str):
+SUPPORTED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
+
+
+def load_dataset(file_path: str | Path) -> pd.DataFrame:
     """
-    Load a CSV or Excel file into a Pandas DataFrame.
+    Load a dataset into a Pandas DataFrame.
+
+    Supported formats:
+    - CSV
+    - XLSX
+    - XLS
     """
 
-    if file_path.endswith(".csv"):
+    file_path = Path(file_path)
+
+    if not file_path.exists():
+        raise FileNotFoundError(f"{file_path} does not exist.")
+
+    suffix = file_path.suffix.lower()
+
+    if suffix not in SUPPORTED_EXTENSIONS:
+        raise ValueError(
+            f"Unsupported file type: {suffix}"
+        )
+
+    if suffix == ".csv":
         return pd.read_csv(file_path)
 
-    elif file_path.endswith(".xlsx"):
-        return pd.read_excel(file_path)
-
-    elif file_path.endswith(".xls"):
-        return pd.read_excel(file_path)
-
-    else:
-        raise ValueError("Unsupported file format.")
+    return pd.read_excel(file_path)
