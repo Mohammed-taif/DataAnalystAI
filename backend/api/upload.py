@@ -1,3 +1,4 @@
+from backend.services.statistics import generate_statistics
 from pathlib import Path
 import shutil
 
@@ -26,11 +27,13 @@ async def upload_file(file: UploadFile = File(...)):
         df = load_dataset(file_path)
 
         profile = profile_dataset(df)
+        statistics = generate_statistics(df)
 
         return {
-            "filename": file.filename,
-            "profile": profile
-        }
+    "filename": file.filename,
+    "profile": profile,
+    "statistics": statistics
+}
 
     except Exception as e:
         raise HTTPException(
