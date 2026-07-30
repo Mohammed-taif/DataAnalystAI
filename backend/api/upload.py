@@ -1,9 +1,9 @@
 from backend.services.statistics import generate_statistics
 from pathlib import Path
 import shutil
-
+from backend.services.ai_service import generate_summary
 from fastapi import APIRouter, File, HTTPException, UploadFile
-
+from backend.services.session_manager import store_dataframe
 from backend.services.data_loader import load_dataset
 from backend.services.profiler import profile_dataset
 
@@ -25,15 +25,19 @@ async def upload_file(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         df = load_dataset(file_path)
+        dataset_id = store_dataframe(df)
 
         profile = profile_dataset(df)
         statistics = generate_statistics(df)
+        ai_summary = generate_summary(profile, statistics)
 
         return {
-    "filename": file.filename,
-    "profile": profile,
-    "statistics": statistics
-}
+            "dataset_id": dataset_id,
+            "filename": file.filename,
+            "profile": profile,
+            "statistics": statistics,
+            "ai_summary": ai_summary
+        }
 
     except Exception as e:
         raise HTTPException(
