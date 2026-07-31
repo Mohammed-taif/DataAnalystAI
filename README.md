@@ -84,7 +84,7 @@ Displays important business metrics:
 
 ## Dataset Upload
 
-![Upload](screenshots/upload.png)
+![Upload](screenshots/Upload.png)
 
 ---
 
