@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-
+from backend.services.plan_validator import validate_plan
 from backend.models.ask import AskRequest
 from backend.services.session_manager import get_dataframe
 from backend.services.tool_registry import TOOLS
@@ -27,6 +27,10 @@ async def ask_question(request: AskRequest):
 
         # Override operation using deterministic Python logic
         plan["operation"] = infer_operation(request.question)
+        plan = validate_plan(
+            plan,
+            list(df.columns)
+        )
 
         tool_name = plan.get("tool")
 
