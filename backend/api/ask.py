@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException
 
 from backend.models.ask import AskRequest
 from backend.services.session_manager import get_dataframe
-from backend.services.question_router import route_question
 from backend.services.tool_registry import TOOLS
 from backend.services.ai_service import explain_analysis
-
+from backend.services.planner import create_plan
+from backend.services.operation_inference import infer_operation
 
 router = APIRouter(
     prefix="/ask",
@@ -15,58 +15,61 @@ router = APIRouter(
 
 @router.post("/")
 async def ask_question(request: AskRequest):
-
     try:
-        # Get uploaded dataframe
+        # Get uploaded dataset
         df = get_dataframe(request.dataset_id)
 
-        # Decide which tool to use
-        tool_name = route_question(request.question)
+        # Ask AI planner what to do
+        plan = create_plan(
+            request.question,
+            list(df.columns)
+        )
 
-        if tool_name is None:
+        # Override operation using deterministic Python logic
+        plan["operation"] = infer_operation(request.question)
+
+        tool_name = plan.get("tool")
+
+        if tool_name not in TOOLS:
             return {
-                "answer": "Sorry, I don't understand that question yet."
+                "error": "Tool not available",
+                "plan": plan
             }
 
-
-        # Run selected tool
+        # Execute tool
         if tool_name == "statistics":
 
             result = TOOLS["statistics"](df)
-
 
         elif tool_name == "groupby":
 
             result = TOOLS["groupby"](
                 df,
-                group_column="Region",
-                value_column="Sales",
-                operation="sum"
+                group_column=plan["group_column"],
+                value_column=plan["value_column"],
+                operation=plan.get("operation", "sum")
             )
 
-
         else:
+
             result = {
-                "message": "Tool not implemented"
+                "message": "Tool execution not implemented"
             }
 
-
-        # Ask Llama to explain the result
+        # Generate AI explanation
         explanation = explain_analysis(
             request.question,
             result
         )
 
-
         return {
+            "plan": plan,
             "tool_used": tool_name,
             "analysis": result,
             "ai_explanation": explanation
         }
 
-
     except Exception as e:
-
         raise HTTPException(
             status_code=400,
             detail=str(e)

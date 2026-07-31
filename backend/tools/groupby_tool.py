@@ -6,35 +6,33 @@ def groupby_aggregate(
     group_column: str,
     value_column: str,
     operation: str = "sum"
-) -> dict:
+):
     """
-    Group data by a column and perform an aggregation.
-
-    Supported operations:
-    sum, mean, min, max, count
+    Perform dynamic aggregation on a dataframe.
     """
 
     if group_column not in df.columns:
-        raise ValueError(f"Column '{group_column}' not found.")
+        raise ValueError(f"{group_column} column not found.")
 
     if value_column not in df.columns:
-        raise ValueError(f"Column '{value_column}' not found.")
+        raise ValueError(f"{value_column} column not found.")
+
+    grouped = df.groupby(group_column)[value_column]
 
     operations = {
-        "sum": "sum",
-        "mean": "mean",
-        "min": "min",
-        "max": "max",
-        "count": "count"
+        "sum": grouped.sum,
+        "mean": grouped.mean,
+        "max": grouped.max,
+        "min": grouped.min,
+        "count": grouped.count,
+        "median": grouped.median
     }
 
     if operation not in operations:
         raise ValueError(f"Unsupported operation: {operation}")
 
-    result = (
-        df.groupby(group_column)[value_column]
-        .agg(operations[operation])
-        .sort_values(ascending=False)
-    )
+    result = operations[operation]()
 
-    return result.to_dict()
+    return result.sort_values(
+        ascending=False
+    ).to_dict()
