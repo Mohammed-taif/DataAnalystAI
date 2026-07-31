@@ -1,85 +1,144 @@
 import {
+
     BarChart,
     Bar,
     XAxis,
     YAxis,
     Tooltip,
-    CartesianGrid,
-    ResponsiveContainer
+    ResponsiveContainer,
+    CartesianGrid
+
 } from "recharts";
+
 
 
 function Chart({ data }) {
 
-    if (!data) return null;
+
+    if (!data || typeof data !== "object") {
+
+        return null;
+
+    }
 
 
-    const chartData = Object.entries(data)
-        .map(([name, value]) => ({
-            name,
-            value
-        }));
+
+    const chartData =
+        Object.entries(data).map(
+            ([name,value]) => ({
+
+                name,
+
+                value
+
+            })
+        );
+
+
+
+    const colors = [
+
+        "#2563eb",
+        "#16a34a",
+        "#9333ea",
+        "#ea580c",
+        "#dc2626"
+
+    ];
+
 
 
     return (
 
+
         <div className="
             bg-white
-            rounded-xl
+            dark:bg-gray-900
+            rounded-2xl
             shadow
             p-6
             mt-6
         ">
 
+
             <h2 className="
-                text-xl
+                text-2xl
                 font-bold
-                mb-4
+                mb-6
+                dark:text-white
             ">
+
                 📊 Data Visualization
+
             </h2>
 
 
-            <div
-                style={{
-                    width: "100%",
-                    height: 400
-                }}
+
+
+            <ResponsiveContainer
+
+                width="100%"
+
+                height={350}
+
             >
 
-                <ResponsiveContainer>
 
-                    <BarChart
-                        data={chartData}
-                    >
+                <BarChart
 
-                        <CartesianGrid />
+                    data={chartData}
 
-
-                        <XAxis
-                            dataKey="name"
-                        />
+                >
 
 
-                        <YAxis />
+                    <CartesianGrid
+
+                        strokeDasharray="3 3"
+
+                    />
 
 
-                        <Tooltip />
+                    <XAxis
+
+                        dataKey="name"
+
+                    />
 
 
-                        <Bar
-                            dataKey="value"
-                        />
-
-                    </BarChart>
-
-                </ResponsiveContainer>
+                    <YAxis />
 
 
-            </div>
+
+                    <Tooltip />
+
+
+
+                    <Bar
+
+                        dataKey="value"
+
+                        radius={[
+                            10,
+                            10,
+                            0,
+                            0
+                        ]}
+
+                        fill="#2563eb"
+
+                    />
+
+
+
+                </BarChart>
+
+
+            </ResponsiveContainer>
+
 
 
         </div>
+
 
     );
 

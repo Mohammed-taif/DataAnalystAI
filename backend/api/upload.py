@@ -6,6 +6,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from backend.services.session_manager import store_dataframe
 from backend.services.data_loader import load_dataset
 from backend.services.profiler import profile_dataset
+from backend.services.insights import generate_insights
 
 router = APIRouter(
     prefix="/upload",
@@ -30,13 +31,15 @@ async def upload_file(file: UploadFile = File(...)):
         profile = profile_dataset(df)
         statistics = generate_statistics(df)
         ai_summary = generate_summary(profile, statistics)
+        insights = generate_insights(df)
 
         return {
             "dataset_id": dataset_id,
             "filename": file.filename,
             "profile": profile,
             "statistics": statistics,
-            "ai_summary": ai_summary
+            "ai_summary": ai_summary,
+            "insights": insights
         }
 
     except Exception as e:

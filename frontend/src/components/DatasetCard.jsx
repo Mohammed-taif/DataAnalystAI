@@ -1,130 +1,133 @@
+import { motion } from "framer-motion";
+
+
 function DatasetCard({ data }) {
+
 
     if (!data) return null;
 
 
     return (
 
-        <div className="
-            bg-white
-            rounded-xl
-            shadow
-            p-6
-            mb-6
-        ">
+        <motion.div
+
+            initial={{
+                opacity: 0,
+                y: 20
+            }}
+
+            animate={{
+                opacity: 1,
+                y: 0
+            }}
+
+            className="
+                bg-white
+                dark:bg-gray-900
+
+                text-gray-900
+                dark:text-white
+
+                rounded-2xl
+                shadow
+
+                p-6
+                mb-6
+            "
+
+        >
 
 
             <h2 className="
                 text-2xl
                 font-bold
-                mb-6
+                mb-5
+
+                text-gray-900
+                dark:text-white
             ">
+
                 📄 Dataset Overview
+
             </h2>
 
 
 
             <div className="
-                grid
-                grid-cols-2
-                md:grid-cols-3
-                gap-4
+                space-y-3
+
+                text-gray-700
+                dark:text-gray-200
             ">
 
 
-                <div className="
-                    bg-gray-100
-                    rounded-lg
-                    p-4
-                ">
+                <p>
+                    <span className="font-bold">
+                        Filename:
+                    </span>
 
-                    <p className="text-gray-500">
-                        📄 File
-                    </p>
+                    {" "}
+                    {data.filename}
 
-                    <p className="font-bold mt-2 truncate">
-                        {data.filename}
-                    </p>
-
-                </div>
+                </p>
 
 
 
-                <div className="
-                    bg-gray-100
-                    rounded-lg
-                    p-4
-                ">
+                <p>
 
-                    <p className="text-gray-500">
-                        📊 Rows
-                    </p>
+                    <span className="font-bold">
+                        Rows:
+                    </span>
 
-                    <p className="text-2xl font-bold">
-                        {data.rows}
-                    </p>
+                    {" "}
+                    {data.rows}
 
-                </div>
+                </p>
 
 
 
-                <div className="
-                    bg-gray-100
-                    rounded-lg
-                    p-4
-                ">
+                <p>
 
-                    <p className="text-gray-500">
-                        🗂️ Columns
-                    </p>
+                    <span className="font-bold">
+                        Columns:
+                    </span>
 
-                    <p className="text-2xl font-bold">
-                        {data.columns}
-                    </p>
+                    {" "}
+                    {data.columns}
 
-                </div>
+                </p>
 
 
 
-                <div className="
-                    bg-gray-100
-                    rounded-lg
-                    p-4
-                ">
+                <p>
 
-                    <p className="text-gray-500">
-                        ⚠️ Missing Values
-                    </p>
+                    <span className="font-bold">
+                        Missing Values:
+                    </span>
 
-                    <p className="text-2xl font-bold">
-                        {data.missing}
-                    </p>
+                    {" "}
+                    {data.missing}
 
-                </div>
+                </p>
 
 
 
-                <div className="
-                    bg-gray-100
-                    rounded-lg
-                    p-4
-                ">
+                <p>
 
-                    <p className="text-gray-500">
-                        🔁 Duplicate Rows
-                    </p>
+                    <span className="font-bold">
+                        Duplicate Rows:
+                    </span>
 
-                    <p className="text-2xl font-bold">
-                        {data.duplicates}
-                    </p>
+                    {" "}
+                    {data.duplicates}
 
-                </div>
+                </p>
 
 
             </div>
 
 
-        </div>
+        </motion.div>
 
     );
 

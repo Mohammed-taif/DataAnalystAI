@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api.upload import router as upload_router
 from backend.api.ask import router as ask_router
+from backend.api.report import router as report_router
 
 app = FastAPI(
     title="DataAnalystAI",
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(upload_router)
 app.include_router(ask_router)
+app.include_router(report_router)
 
 
 @app.get("/")

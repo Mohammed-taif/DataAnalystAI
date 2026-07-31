@@ -6,119 +6,76 @@ import Chart from "./Chart";
 function Chat({ datasetId }) {
 
 
-    const [question, setQuestion] = useState("");
+    const [question,setQuestion] = useState("");
 
-    const [messages, setMessages] = useState([]);
+    const [answer,setAnswer] = useState("");
 
-    const [loading, setLoading] = useState(false);
+    const [loading,setLoading] = useState(false);
 
-    const [chartData, setChartData] = useState(null);
-
-
-
-    const askQuestion = async () => {
-
-
-        if (!question.trim()) return;
-
-
-        const userQuestion = question;
-
-
-        setQuestion("");
-
-
-        setMessages(prev => [
-
-            ...prev,
-
-            {
-                role: "user",
-                text: userQuestion
-            }
-
-        ]);
+    const [chartData,setChartData] = useState(null);
 
 
 
-        try {
+    const askQuestion = async()=>{
+
+
+        if(!question) return;
+
+
+
+        try{
 
 
             setLoading(true);
 
-
-
-            const response = await API.post(
-                "/ask/",
-                {
-                    dataset_id: datasetId,
-                    question: userQuestion
-                }
+            setAnswer(
+                "Analyzing data..."
             );
 
 
 
-            setMessages(prev => [
-
-                ...prev,
-
-                {
-                    role: "ai",
-                    text: response.data.ai_explanation
-                }
-
-            ]);
-
-
-
-            // FIXED chart data
-            if (
-                response.data.analysis?.data
-            ) {
-
-                setChartData(
-                    response.data.analysis.data
+            const response =
+                await API.post(
+                    "/ask/",
+                    {
+                        dataset_id: datasetId,
+                        question: question
+                    }
                 );
 
-            }
-            else {
 
-                setChartData(
-                    response.data.analysis
-                );
 
-            }
+            setAnswer(
+                response.data.ai_explanation
+            );
+
+
+            setChartData(
+                response.data.analysis.data ||
+                response.data.analysis
+            );
 
 
 
         }
+        catch(error){
 
 
-        catch(error) {
-
-
-            setMessages(prev => [
-
-                ...prev,
-
-                {
-                    role: "ai",
-                    text:
-                    error.response?.data?.detail ||
-                    "Something went wrong"
-                }
-
-            ]);
+            setAnswer(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            );
 
 
         }
+        finally{
 
-
-        finally {
 
             setLoading(false);
 
+
         }
+
 
     };
 
@@ -126,7 +83,10 @@ function Chat({ datasetId }) {
 
     return (
 
-        <div>
+        <div className="
+            text-gray-900
+            dark:text-white
+        ">
 
 
             <h2 className="
@@ -134,94 +94,21 @@ function Chat({ datasetId }) {
                 font-bold
                 mb-4
             ">
+
                 🤖 Ask AI Analyst
+
             </h2>
 
 
 
+
             <div className="
-                space-y-4
-                mb-6
-                max-h-96
-                overflow-y-auto
+                flex
+                gap-3
             ">
 
 
-                {
-                    messages.map(
-                        (msg,index)=>(
-
-                            <div
-
-                                key={index}
-
-                                className={
-                                    msg.role === "user"
-                                    ?
-                                    "bg-blue-100 p-4 rounded-lg ml-auto max-w-xl"
-                                    :
-                                    "bg-gray-100 p-4 rounded-lg max-w-xl"
-                                }
-
-                            >
-
-                                <p className="font-bold">
-
-                                    {
-                                        msg.role === "user"
-                                        ?
-                                        "You"
-                                        :
-                                        "AI"
-                                    }
-
-                                </p>
-
-
-                                <p className="whitespace-pre-line">
-                                    {msg.text}
-                                </p>
-
-
-                            </div>
-
-                        )
-                    )
-                }
-
-
-
-                {
-                    loading && (
-
-                        <div className="
-                            bg-gray-100
-                            p-4
-                            rounded-lg
-                        ">
-                            🤖 AI is thinking...
-                        </div>
-
-                    )
-                }
-
-
-            </div>
-
-
-
-
-            <div className="flex gap-3">
-
-
                 <input
-
-                    className="
-                    flex-1
-                    border
-                    rounded-lg
-                    p-3
-                    "
 
                     value={question}
 
@@ -229,7 +116,23 @@ function Chat({ datasetId }) {
                         setQuestion(e.target.value)
                     }
 
-                    placeholder="Ask about your dataset..."
+
+                    placeholder="
+                    Ask about your dataset...
+                    "
+
+
+                    className="
+                        flex-1
+                        border
+                        rounded-xl
+                        p-3
+
+                        text-gray-900
+                        dark:text-white
+
+                        dark:bg-gray-800
+                    "
 
                 />
 
@@ -237,22 +140,31 @@ function Chat({ datasetId }) {
 
                 <button
 
-                    className="
-                    bg-blue-600
-                    text-white
-                    px-6
-                    rounded-lg
-                    "
-
                     onClick={askQuestion}
 
                     disabled={loading}
 
+                    className="
+                        bg-blue-600
+                        text-white
+
+                        px-6
+                        rounded-xl
+                    "
+
                 >
 
-                    Ask
+                    {
+                        loading
+                        ?
+                        "Thinking..."
+                        :
+                        "Ask"
+                    }
+
 
                 </button>
+
 
 
             </div>
@@ -260,14 +172,30 @@ function Chat({ datasetId }) {
 
 
 
+            <div className="
+                mt-5
+                bg-gray-100
+                dark:bg-gray-800
+
+                rounded-xl
+                p-4
+
+                text-gray-900
+                dark:text-white
+            ">
+
+                {answer}
+
+            </div>
+
+
+
+
             {
-                chartData && (
+                chartData &&
 
-                    <Chart
-                        data={chartData}
-                    />
+                <Chart data={chartData}/>
 
-                )
             }
 
 
