@@ -78,7 +78,7 @@ Displays important business metrics:
 
 ## Dashboard
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/Dashboard.png)
 
 ---
 
