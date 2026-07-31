@@ -1,19 +1,26 @@
 from ollama import chat
-from backend.core.config import settings
-from backend.prompts.summary_prompt import SUMMARY_PROMPT
+import json
 
-def generate_summary(profile: dict, statistics: dict) -> str:
-    """
-    Generate an executive summary of the uploaded dataset
-    using the local Ollama model.
-    """
 
-    prompt = SUMMARY_PROMPT.format(
-    profile=profile,
-    statistics=statistics
-)
+def generate_summary(profile, statistics):
+
+    prompt = f"""
+You are a data analyst.
+
+Create a short summary using only the provided dataset information.
+
+Dataset profile:
+{json.dumps(profile, indent=2)}
+
+Statistics:
+{json.dumps(statistics, indent=2)}
+
+Do not invent numbers.
+"""
+
+
     response = chat(
-        model=settings.OLLAMA_MODEL,
+        model="llama3.2:3b",
         messages=[
             {
                 "role": "user",
@@ -21,28 +28,45 @@ def generate_summary(profile: dict, statistics: dict) -> str:
             }
         ]
     )
+
 
     return response["message"]["content"]
 
-from ollama import chat
-
-from backend.prompts.analysis_prompt import ANALYSIS_PROMPT
-from backend.core.config import settings
 
 
-def explain_analysis(question: str, result: dict) -> str:
-    """
-    Convert tool output into a human-friendly explanation
-    using the local Llama model.
-    """
+def explain_analysis(question, result):
 
-    prompt = ANALYSIS_PROMPT.format(
-        question=question,
-        result=result
-    )
+
+    prompt = f"""
+You are an AI data analyst assistant.
+
+Answer the user's question using ONLY the analysis result below.
+
+STRICT RULES:
+- Never create new numbers.
+- Never modify numbers.
+- Never guess.
+- Never use outside information.
+- Mention only values present in the result.
+- Keep the explanation short and clear.
+
+
+User question:
+
+{question}
+
+
+Analysis result:
+
+{json.dumps(result, indent=2)}
+
+
+Provide the explanation:
+"""
+
 
     response = chat(
-        model=settings.OLLAMA_MODEL,
+        model="llama3.2:3b",
         messages=[
             {
                 "role": "user",
@@ -50,5 +74,6 @@ def explain_analysis(question: str, result: dict) -> str:
             }
         ]
     )
+
 
     return response["message"]["content"]

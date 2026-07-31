@@ -11,10 +11,7 @@ import {
 
 function Chart({ data }) {
 
-
-    if (!data) {
-        return null;
-    }
+    if (!data) return null;
 
 
     const chartData = Object.entries(data)
@@ -26,42 +23,66 @@ function Chart({ data }) {
 
     return (
 
-        <div style={{ width: "600px", height: "400px" }}>
+        <div className="
+            bg-white
+            rounded-xl
+            shadow
+            p-6
+            mt-6
+        ">
 
-            <h2>
-                Data Visualization 📊
+            <h2 className="
+                text-xl
+                font-bold
+                mb-4
+            ">
+                📊 Data Visualization
             </h2>
 
 
-            <ResponsiveContainer
-                width="100%"
-                height="100%"
+            <div
+                style={{
+                    width: "100%",
+                    height: 400
+                }}
             >
 
-                <BarChart data={chartData}>
+                <ResponsiveContainer>
 
-                    <CartesianGrid />
+                    <BarChart
+                        data={chartData}
+                    >
 
-                    <XAxis
-                        dataKey="name"
-                    />
+                        <CartesianGrid />
 
-                    <YAxis />
 
-                    <Tooltip />
+                        <XAxis
+                            dataKey="name"
+                        />
 
-                    <Bar
-                        dataKey="value"
-                    />
 
-                </BarChart>
+                        <YAxis />
 
-            </ResponsiveContainer>
+
+                        <Tooltip />
+
+
+                        <Bar
+                            dataKey="value"
+                        />
+
+                    </BarChart>
+
+                </ResponsiveContainer>
+
+
+            </div>
 
 
         </div>
 
     );
+
 }
 
 
